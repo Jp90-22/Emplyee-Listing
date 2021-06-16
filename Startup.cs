@@ -6,7 +6,7 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-
+using Newtonsoft.Json.Serialization; //For use this package you need: Microsoft.AspNetCore.Mvc.NewtonsoftJson
 namespace EmployeeEnviroment
 {
     public class Startup
@@ -21,7 +21,19 @@ namespace EmployeeEnviroment
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllersWithViews();
+            //JSON Serializer with Newtonsoft  
+            services.AddControllersWithViews().AddNewtonsoftJson(options => 
+                    options.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore
+            ).AddNewtonsoftJson(options => 
+                    options.SerializerSettings.ContractResolver = new DefaultContractResolver()
+            );
+
+            //Enable Cors for Allow every http request
+            services.AddCors(config => {
+                config.AddPolicy("AllowOrigin", options => 
+                    //Allow the origin and its requests
+                    options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+            });
 
             // In production, the React files will be served from this directory
             services.AddSpaStaticFiles(configuration =>
@@ -36,6 +48,9 @@ namespace EmployeeEnviroment
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
+                app.UseCors(options => 
+                    options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
+                );
             }
             else
             {
