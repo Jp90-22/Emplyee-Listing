@@ -53,5 +53,111 @@ namespace EmployeeEnviroment.Controllers
 
             return new JsonResult(dataTable);
         }
+
+        [HttpGet("{id}")]
+        public JsonResult Get(int id) 
+        {
+            DataTable dataTable = new DataTable("Department");
+
+            //Get data using connection context:
+            using (myCon = new SqlConnection(sqlSource))
+            {
+                myCon.Open();
+                using (mySqlCommand = new SqlCommand("Select_one_Department", myCon))
+                {
+                    mySqlCommand.CommandType = CommandType.StoredProcedure;
+                    mySqlCommand.Parameters.AddWithValue("@Target", id);
+                    mySqlReader = mySqlCommand.ExecuteReader();
+
+                    dataTable.Load(mySqlReader); //Load the data in the table
+
+                    mySqlReader.Close();
+                    myCon.Close();
+                }
+            }
+
+            return new JsonResult(dataTable);
+        }
+
+        [HttpPost]
+        public StatusCodeResult Post(Department department) 
+        {
+            using (myCon = new SqlConnection(sqlSource))
+            {
+                myCon.Open();
+                using (mySqlCommand = new SqlCommand("Insert_Department", myCon))
+                {
+                    //Using Stored Procedures, add a new department in the db
+                    mySqlCommand.CommandType = CommandType.StoredProcedure;
+                    mySqlCommand.Parameters.AddWithValue("@Name", department.DepartmentName);
+
+                    try
+                    {
+                        mySqlCommand.ExecuteNonQuery();
+                        myCon.Close();
+                        return StatusCode(200); 
+                    }
+                    catch (SqlException)
+                    {
+                        return BadRequest();
+                        throw;
+                    }
+                }
+            }
+        }
+
+        [HttpPut]
+        public JsonResult Put(Department department) 
+        {
+            using (myCon = new SqlConnection(sqlSource))
+            {
+                myCon.Open();
+                using (mySqlCommand = new SqlCommand("Update_Department", myCon))
+                {
+                    //Using Stored Procedures, update a department in the db
+                    mySqlCommand.CommandType = CommandType.StoredProcedure;
+                    mySqlCommand.Parameters.AddWithValue("@Target", department.DepartmentId);
+                    mySqlCommand.Parameters.AddWithValue("@Name", department.DepartmentName);
+
+                    try
+                    {
+                        mySqlCommand.ExecuteNonQuery();
+                        myCon.Close();
+                        return Get(); 
+                    }
+                    catch (SqlException)
+                    {
+                        return new JsonResult("Something were worng!!");
+                        throw;
+                    }
+                }
+            }
+        }
+
+        [HttpDelete("{id}")]
+        public JsonResult Delete(int id) 
+        {
+            using (myCon = new SqlConnection(sqlSource))
+            {
+                myCon.Open();
+                using (mySqlCommand = new SqlCommand("Delete_Department", myCon))
+                {
+                    mySqlCommand.CommandType = CommandType.StoredProcedure;
+                    mySqlCommand.Parameters.AddWithValue("@Target", id);
+
+                    try
+                    {
+                        mySqlCommand.ExecuteNonQuery();
+                        myCon.Close();
+                        return Get(); 
+                    }
+                    catch (SqlException)
+                    {
+                        return new JsonResult("Something were worng!!");
+                        throw;
+                    }
+                }
+            }
+        }
     }
 }

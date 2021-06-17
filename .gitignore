@@ -29,6 +29,9 @@ Obj/
 .vscode/
 /wwwroot/dist/
 
+# Data base folders and files
+sql/
+
 # MSTest test Results
 [Tt]est[Rr]esult*/
 [Bb]uild[Ll]og.*
