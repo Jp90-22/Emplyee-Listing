@@ -1,12 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Data;
 using System.Data.SqlClient; // For use this you need 'System.Data.SqlClient' package
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
+using Microsoft.AspNetCore.Hosting;
 using EmployeeEnviroment.Models;
 
 namespace EmployeeEnviroment.Controllers
@@ -15,23 +17,25 @@ namespace EmployeeEnviroment.Controllers
     [Route("api/[controller]")]
     public class EmployeeController : ControllerBase
     {
-        
+
         //Tools and configurations
         private readonly IConfiguration _configuration;
-        private readonly string  sqlSource;
+        private readonly IWebHostEnvironment _enviroment;
+        private readonly string sqlSource;
         public SqlConnection myCon;
         public SqlCommand mySqlCommand;
         public SqlDataReader mySqlReader;
 
         //Dependency Injection
-        public EmployeeController(IConfiguration config)
+        public EmployeeController(IConfiguration config, IWebHostEnvironment env)
         {
             _configuration = config;
+            _enviroment = env;
             sqlSource = _configuration.GetConnectionString("EmployeeAppCon"); //Setting the connection string by dependency injection
         }
 
         [HttpGet]
-        public JsonResult Get() 
+        public JsonResult Get()
         {
             DataTable dataTable = new DataTable("Employee");
 
@@ -55,7 +59,7 @@ namespace EmployeeEnviroment.Controllers
         }
 
         [HttpGet("{id}")]
-        public JsonResult Get(int id) 
+        public JsonResult Get(int id)
         {
             DataTable dataTable = new DataTable("Employee");
 
@@ -80,7 +84,7 @@ namespace EmployeeEnviroment.Controllers
         }
 
         [HttpPost]
-        public StatusCodeResult Post(Employee employee) 
+        public StatusCodeResult Post(Employee employee)
         {
             using (myCon = new SqlConnection(sqlSource))
             {
@@ -96,13 +100,13 @@ namespace EmployeeEnviroment.Controllers
 
                     mySqlCommand.ExecuteNonQuery();
                     myCon.Close();
-                    return StatusCode(200); 
+                    return StatusCode(200);
                 }
             }
         }
 
         [HttpPut]
-        public JsonResult Put(Employee employee) 
+        public JsonResult Put(Employee employee)
         {
             using (myCon = new SqlConnection(sqlSource))
             {
@@ -117,16 +121,16 @@ namespace EmployeeEnviroment.Controllers
                     mySqlCommand.Parameters.AddWithValue("@JoinDate", employee.DateOfJoining);
                     mySqlCommand.Parameters.AddWithValue("@Potho", employee.PothoFileName);
 
-                    
+
                     mySqlCommand.ExecuteNonQuery();
                     myCon.Close();
-                    return Get(); 
+                    return Get();
                 }
             }
         }
 
         [HttpDelete("{id}")]
-        public JsonResult Delete(int id) 
+        public JsonResult Delete(int id)
         {
             using (myCon = new SqlConnection(sqlSource))
             {
@@ -138,8 +142,36 @@ namespace EmployeeEnviroment.Controllers
 
                     mySqlCommand.ExecuteNonQuery();
                     myCon.Close();
-                    return Get(); 
+                    return Get();
                 }
+            }
+        }
+
+        // Save potho files API method
+        [Route("[action]")]
+        [HttpPost]
+        public JsonResult SaveFiles()
+        {
+            try
+            {
+                var httpRequest = Request.Form; // Convert the request into form
+                var postedFile = httpRequest.Files[0]; //  Get the first file of the request
+                string fileName = postedFile.FileName; 
+                var physicalPath = _enviroment.ContentRootPath + "/Photos/" + fileName;
+
+                //Create a stream for new file and copy postedFile to that stream
+                using (var stream = new FileStream(physicalPath, FileMode.Create))
+                {
+                    postedFile.CopyTo(stream);
+                }
+
+                return new JsonResult(fileName);
+
+            }
+            catch (Exception)
+            {
+                return new JsonResult("anonymous.png");
+                throw;
             }
         }
     }

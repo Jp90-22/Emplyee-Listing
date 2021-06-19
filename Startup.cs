@@ -1,3 +1,4 @@
+using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -6,7 +7,10 @@ using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.FileProviders;
 using Newtonsoft.Json.Serialization; //For use this package you need: Microsoft.AspNetCore.Mvc.NewtonsoftJson
+
+
 namespace EmployeeEnviroment
 {
     public class Startup
@@ -60,9 +64,25 @@ namespace EmployeeEnviroment
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
-            app.UseSpaStaticFiles();
 
+            #region Serving Photos directory as static files
+            // Combines the current directory and photos' directory for the root of new file provider
+            string photoPath = Path.Combine(Directory.GetCurrentDirectory(), "Photos");
+            
+            if (!Directory.Exists(photoPath))
+            {
+                Directory.CreateDirectory(photoPath);
+            }
+            
+            app.UseStaticFiles(new StaticFileOptions
+            {
+                //Using a new File provider options with the directory of photoPath
+                FileProvider = new PhysicalFileProvider(photoPath)
+            });
+            #endregion
+
+            app.UseSpaStaticFiles();
+        
             app.UseRouting();
 
             app.UseEndpoints(endpoints =>
