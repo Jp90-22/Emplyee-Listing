@@ -13,7 +13,7 @@ namespace EmployeeEnviroment.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class DepartmentController : ControllerBase
+    public class EmployeeController : ControllerBase
     {
         
         //Tools and configurations
@@ -24,7 +24,7 @@ namespace EmployeeEnviroment.Controllers
         public SqlDataReader mySqlReader;
 
         //Dependency Injection
-        public DepartmentController(IConfiguration config)
+        public EmployeeController(IConfiguration config)
         {
             _configuration = config;
             sqlSource = _configuration.GetConnectionString("EmployeeAppCon"); //Setting the connection string by dependency injection
@@ -33,13 +33,13 @@ namespace EmployeeEnviroment.Controllers
         [HttpGet]
         public JsonResult Get() 
         {
-            DataTable dataTable = new DataTable("Department");
+            DataTable dataTable = new DataTable("Employee");
 
             //Get data using connection context:
             using (myCon = new SqlConnection(sqlSource))
             {
                 myCon.Open();
-                using (mySqlCommand = new SqlCommand("Select_Department", myCon))
+                using (mySqlCommand = new SqlCommand("Select_Employee", myCon))
                 {
                     mySqlCommand.CommandType = CommandType.StoredProcedure;
                     mySqlReader = mySqlCommand.ExecuteReader();
@@ -57,13 +57,13 @@ namespace EmployeeEnviroment.Controllers
         [HttpGet("{id}")]
         public JsonResult Get(int id) 
         {
-            DataTable dataTable = new DataTable("Department");
+            DataTable dataTable = new DataTable("Employee");
 
             //Get data using connection context:
             using (myCon = new SqlConnection(sqlSource))
             {
                 myCon.Open();
-                using (mySqlCommand = new SqlCommand("Select_one_Department", myCon))
+                using (mySqlCommand = new SqlCommand("Select_one_Employee", myCon))
                 {
                     mySqlCommand.CommandType = CommandType.StoredProcedure;
                     mySqlCommand.Parameters.AddWithValue("@Target", id);
@@ -80,56 +80,47 @@ namespace EmployeeEnviroment.Controllers
         }
 
         [HttpPost]
-        public StatusCodeResult Post(Department department) 
+        public StatusCodeResult Post(Employee employee) 
         {
             using (myCon = new SqlConnection(sqlSource))
             {
                 myCon.Open();
-                using (mySqlCommand = new SqlCommand("Insert_Department", myCon))
+                using (mySqlCommand = new SqlCommand("Insert_Employee", myCon))
                 {
                     //Using Stored Procedures, add a new department in the db
                     mySqlCommand.CommandType = CommandType.StoredProcedure;
-                    mySqlCommand.Parameters.AddWithValue("@Name", department.DepartmentName);
+                    mySqlCommand.Parameters.AddWithValue("@Name", employee.EmployeeName);
+                    mySqlCommand.Parameters.AddWithValue("@Department", employee.Department);
+                    mySqlCommand.Parameters.AddWithValue("@JoinDate", employee.DateOfJoining);
+                    mySqlCommand.Parameters.AddWithValue("@Potho", employee.PothoFileName);
 
-                    try
-                    {
-                        mySqlCommand.ExecuteNonQuery();
-                        myCon.Close();
-                        return StatusCode(200); 
-                    }
-                    catch (SqlException)
-                    {
-                        return BadRequest();
-                        throw;
-                    }
+                    mySqlCommand.ExecuteNonQuery();
+                    myCon.Close();
+                    return StatusCode(200); 
                 }
             }
         }
 
         [HttpPut]
-        public JsonResult Put(Department department) 
+        public JsonResult Put(Employee employee) 
         {
             using (myCon = new SqlConnection(sqlSource))
             {
                 myCon.Open();
-                using (mySqlCommand = new SqlCommand("Update_Department", myCon))
+                using (mySqlCommand = new SqlCommand("Update_Employee", myCon))
                 {
                     //Using Stored Procedures, update a department in the db
                     mySqlCommand.CommandType = CommandType.StoredProcedure;
-                    mySqlCommand.Parameters.AddWithValue("@Target", department.DepartmentId);
-                    mySqlCommand.Parameters.AddWithValue("@Name", department.DepartmentName);
+                    mySqlCommand.Parameters.AddWithValue("@Target", employee.EmployeeId);
+                    mySqlCommand.Parameters.AddWithValue("@Name", employee.EmployeeName);
+                    mySqlCommand.Parameters.AddWithValue("@Department", employee.Department);
+                    mySqlCommand.Parameters.AddWithValue("@JoinDate", employee.DateOfJoining);
+                    mySqlCommand.Parameters.AddWithValue("@Potho", employee.PothoFileName);
 
-                    try
-                    {
-                        mySqlCommand.ExecuteNonQuery();
-                        myCon.Close();
-                        return Get(); 
-                    }
-                    catch (SqlException)
-                    {
-                        return new JsonResult("Something went worng!!");
-                        throw;
-                    }
+                    
+                    mySqlCommand.ExecuteNonQuery();
+                    myCon.Close();
+                    return Get(); 
                 }
             }
         }
@@ -140,22 +131,14 @@ namespace EmployeeEnviroment.Controllers
             using (myCon = new SqlConnection(sqlSource))
             {
                 myCon.Open();
-                using (mySqlCommand = new SqlCommand("Delete_Department", myCon))
+                using (mySqlCommand = new SqlCommand("Delete_Employee", myCon))
                 {
                     mySqlCommand.CommandType = CommandType.StoredProcedure;
                     mySqlCommand.Parameters.AddWithValue("@Target", id);
 
-                    try
-                    {
-                        mySqlCommand.ExecuteNonQuery();
-                        myCon.Close();
-                        return Get(); 
-                    }
-                    catch (SqlException)
-                    {
-                        return new JsonResult("Something went worng!!");
-                        throw;
-                    }
+                    mySqlCommand.ExecuteNonQuery();
+                    myCon.Close();
+                    return Get(); 
                 }
             }
         }
