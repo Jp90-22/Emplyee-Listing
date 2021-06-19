@@ -174,5 +174,30 @@ namespace EmployeeEnviroment.Controllers
                 throw;
             }
         }
+
+        [Route("GetDepartmentNames")]
+        [HttpGet]
+        public JsonResult GetAllDepartmentNames()
+        {
+            DataTable dataTable = new DataTable("Department Names");
+
+            //Get data using connection context:
+            using (myCon = new SqlConnection(sqlSource))
+            {
+                myCon.Open();
+                using (mySqlCommand = new SqlCommand("Select_All_Employee_DepartmentNames", myCon))
+                {
+                    mySqlCommand.CommandType = CommandType.StoredProcedure;
+                    mySqlReader = mySqlCommand.ExecuteReader();
+
+                    dataTable.Load(mySqlReader); //Load the data in the table
+
+                    mySqlReader.Close();
+                    myCon.Close();
+                }
+            }
+
+            return new JsonResult(dataTable);
+        }
     }
 }
