@@ -2,6 +2,7 @@
 
 #Es lint config
 *.eslintrc.json
+tsconfig.json
 
 # dependencies
 /node_modules
