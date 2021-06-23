@@ -1,10 +1,9 @@
 import * as React from 'react';
-import {NavLink} from 'react-router-dom';
+import {Link} from 'react-router-dom';
 import {Navbar, Nav, NavbarToggler, Collapse} from 'reactstrap';
 
 export default class Navigation extends React.Component {
-
-
+    
     state = {
         isNavColapsed: false
     }
@@ -14,21 +13,21 @@ export default class Navigation extends React.Component {
 
     render() {
         return(
-            <Navbar className="bg-primary justify-content-center" dark expand="md">
+            <Navbar className="bg-primary justify-content-center" light expand="md">
                 <NavbarToggler onClick={this.toggle}/>
                 <Collapse isOpen={this.state.isNavColapsed} navbar>
-                    <Nav className="justify-content-center" navbar>
-                        <NavLink className="d-inline p-2 text-white" to="/">
+                    <Nav className="d-flex justify-content-center" navbar>
+                        <Link className="d-inline p-2 text-white" to="/">
                             Home
-                        </NavLink>
+                        </Link>
                         
-                        <NavLink className="d-inline p-2 text-white" to="/department">
+                        <Link className="d-inline p-2 text-white" to="/department">
                             Department
-                        </NavLink>
+                        </Link>
 
-                        <NavLink className="d-inline p-2 text-white" to="/employee">
+                        <Link className="d-inline p-2 text-white" to="/employee">
                             Employee
-                        </NavLink>
+                        </Link>
                     </Nav>
                 </Collapse>
             </Navbar>
