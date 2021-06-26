@@ -27,8 +27,8 @@ export default class Department extends React.Component {
 
     componentDidMount() {
         this.refreshDepartmentsList();
-        console.log(this.state.depts);
-        console.log(process.env.REACT_APP_API);
+        // console.log(this.state.depts);
+        // console.log(process.env.REACT_APP_API);
     }
 
     componentDidUpdate() {
@@ -67,7 +67,7 @@ export default class Department extends React.Component {
                     </tbody>
                 </Table>
                 
-                <Button color="primary" onClick={this.toggleModel} size="lg">Add a new department</Button> 
+                <Button className="mb-5" color="primary" onClick={this.toggleModel} size="lg">Add a new department</Button> 
                 <AddDeptModal isOpen={this.state.modelOpened} toggle={this.toggleModel} />
             </div>
         )

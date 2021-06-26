@@ -95,7 +95,7 @@ namespace EmployeeEnviroment.Controllers
                     {
                         mySqlCommand.ExecuteNonQuery();
                         myCon.Close();
-                        return StatusCode(200); 
+                        return Ok(); 
                     }
                     catch (SqlException)
                     {

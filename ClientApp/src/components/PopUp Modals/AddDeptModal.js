@@ -5,10 +5,36 @@ export default class AddDeptModal extends React.Component {
     constructor(props) {
         super(props);
         this.props = props;
+
+        this.onInputChange = this.onInputChange.bind(this);
+    }
+
+    state = {
+        inputValue: ''
+    }
+
+    onInputChange (evt) {
+        this.setState({inputValue: evt.target.value})
     }
 
     addNewDepartment = (evt) => {
-        evt.preventDefault(); 
+        evt.preventDefault();
+
+        if(this.state.inputValue === '') {
+            alert("You can't send a department without a name")
+        }
+
+        else {
+            //AJAX Post method:
+            fetch(process.env.REACT_APP_API + "department", {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({"DepartmentName": this.state.inputValue})
+            })
+                .then(response => response.ok)
+                .then(result => { alert("Department in!") })
+                .catch(error => { alert("Ups! something went worng...\n" + error) })
+        }
     }
 
     render() {
@@ -23,17 +49,13 @@ export default class AddDeptModal extends React.Component {
                     </ModalHeader>
                     
                     <ModalBody>
-                        <Form>
+                        <Form onSubmit={this.addNewDepartment}>
                             <Row>
                                 <Col sm={6}>
                                     <Label for="inputDepartmentName">Department name:</Label>
-                                    <Input type="text" id="inputDepartmentName" placeholder="ITexample" />
-                                </Col>
-                            </Row>
-                            <br />
-                            <Row>
-                                <Col sm={6}>
-                                    <Button color="info" onClick={this.addNewDepartment}>Add department</Button>
+                                    <Input type="text" id="inputDepartmentName" onChange={this.onInputChange} value={this.state.inputValue} placeholder="ITexample" /> {/* I'll use JQuery for validatio now i'm using this form */}
+                                    <br />
+                                    <Button color="info">Add department</Button>
                                 </Col>
                             </Row>
                         </Form>
