@@ -175,6 +175,7 @@ namespace EmployeeEnviroment.Controllers
             }
         }
 
+        // Get all employee's department names
         [Route("GetDepartmentNames")]
         [HttpGet]
         public JsonResult GetAllDepartmentNames()

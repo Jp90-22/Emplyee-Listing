@@ -77,7 +77,8 @@ namespace EmployeeEnviroment
             app.UseStaticFiles(new StaticFileOptions
             {
                 //Using a new File provider options with the directory of photoPath
-                FileProvider = new PhysicalFileProvider(photoPath)
+                FileProvider = new PhysicalFileProvider(photoPath),
+                RequestPath = "/Photos"
             });
             #endregion
 
