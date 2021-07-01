@@ -24,7 +24,6 @@ export default class AddEmpModal extends React.Component {
 
     addNewEmployee = (evt) => {
         evt.preventDefault();
-        console.log(evt.target.pickerDateOfJoinin.value)
         //AJAX Post method:
         fetch(process.env.REACT_APP_API + "employee", {
             method: 'POST',
@@ -32,15 +31,13 @@ export default class AddEmpModal extends React.Component {
             body: JSON.stringify({
                 EmployeeName: evt.target.inputEmployeeName.value,
                 Department: evt.target.inputDepartmentName.value,
-                DateOfJoinin: evt.target.pickerDateOfJoinin.value,
+                DateOfJoining: evt.target.pickerDateOfJoining.value,
                 PhotoFileName: this.photoThumbnail
             })
         })
             .then(response => response.ok)
-            .then(result => { alert("Employee in!") })
+            .then(result => { alert("Employee in!"); this.props.toggle(); })
             .catch(error => { alert("Ups! something went worng...\n" + error) })
-
-        this.props.toggle();
     }
 
     handleFileSelected = (evt) => {
@@ -89,12 +86,12 @@ export default class AddEmpModal extends React.Component {
                                     </FormGroup>
 
                                     <FormGroup>
-                                        <Label for="pickerDateOfJoinin">Date of Joining:</Label>
-                                        <Input type="date" id="pickerDateOfJoinin" required /> {/* I'll use JQuery for validatio now i'm using this form */}
+                                        <Label for="pickerDateOfJoining">Date of Joining:</Label>
+                                        <Input type="date" id="pickerDateOfJoining" required /> {/* I'll use JQuery for validatio now i'm using this form */}
                                      </FormGroup>
 
 
-                                    <Button color="info">Add department</Button>
+                                    <Button color="info">Add employee</Button>
                                 </Col>
 
                                 <Col sm={6}> 

@@ -24,6 +24,7 @@ export default class Employee extends React.Component {
     }));
 
     enterEditMode = (model) => {
+        console.log(model)
         this.setState({targetToEdit: model});
         this.toggleEditModal();
     }

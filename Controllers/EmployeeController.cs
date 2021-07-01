@@ -96,7 +96,7 @@ namespace EmployeeEnviroment.Controllers
                     mySqlCommand.Parameters.AddWithValue("@Name", employee.EmployeeName);
                     mySqlCommand.Parameters.AddWithValue("@Department", employee.Department);
                     mySqlCommand.Parameters.AddWithValue("@JoinDate", employee.DateOfJoining);
-                    mySqlCommand.Parameters.AddWithValue("@Potho", employee.PothoFileName);
+                    mySqlCommand.Parameters.AddWithValue("@Photo", employee.PhotoFileName);
 
                     mySqlCommand.ExecuteNonQuery();
                     myCon.Close();
@@ -119,7 +119,7 @@ namespace EmployeeEnviroment.Controllers
                     mySqlCommand.Parameters.AddWithValue("@Name", employee.EmployeeName);
                     mySqlCommand.Parameters.AddWithValue("@Department", employee.Department);
                     mySqlCommand.Parameters.AddWithValue("@JoinDate", employee.DateOfJoining);
-                    mySqlCommand.Parameters.AddWithValue("@Potho", employee.PothoFileName);
+                    mySqlCommand.Parameters.AddWithValue("@Photo", employee.PhotoFileName);
 
 
                     mySqlCommand.ExecuteNonQuery();
@@ -147,7 +147,7 @@ namespace EmployeeEnviroment.Controllers
             }
         }
 
-        // Save potho files API method
+        // Save photo files API method
         [Route("[action]")]
         [HttpPost]
         public JsonResult SaveFiles()
