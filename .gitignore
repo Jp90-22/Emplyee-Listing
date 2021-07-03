@@ -32,8 +32,11 @@ Obj/
 # Data base folders and files
 sql/
 
-#Pothos folder (note: the app will create this folder automatically)
+# Pothos folder (note: the app will create this folder automatically)
 Photos/
+
+# Work flow files and flowcharts
+Work Flow/
 
 # MSTest test Results
 [Tt]est[Rr]esult*/
