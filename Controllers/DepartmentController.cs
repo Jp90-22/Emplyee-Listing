@@ -16,18 +16,22 @@ namespace EmployeeEnviroment.Controllers
     public class DepartmentController : ControllerBase
     {
         
-        //Tools and configurations
+        // Tools and configurations
         private readonly IConfiguration _configuration;
+        private readonly ILogger _logger; // Use this for testing
         private readonly string  sqlSource;
-        public SqlConnection myCon;
+        public readonly SqlConnection myCon;
         public SqlCommand mySqlCommand;
         public SqlDataReader mySqlReader;
 
         //Dependency Injection
-        public DepartmentController(IConfiguration config)
+        public DepartmentController(IConfiguration config, ILogger<DepartmentController> logger)
         {
             _configuration = config;
+            _logger = logger;
+            
             sqlSource = _configuration.GetConnectionString("EmployeeAppCon"); //Setting the connection string by dependency injection
+            myCon = new SqlConnection(sqlSource);
         }
 
         [HttpGet]
@@ -36,7 +40,7 @@ namespace EmployeeEnviroment.Controllers
             DataTable dataTable = new DataTable("Department");
 
             //Get data using connection context:
-            using (myCon = new SqlConnection(sqlSource))
+            using (myCon)
             {
                 myCon.Open();
                 using (mySqlCommand = new SqlCommand("Select_Department", myCon))
@@ -47,8 +51,8 @@ namespace EmployeeEnviroment.Controllers
                     dataTable.Load(mySqlReader); //Load the data in the table
 
                     mySqlReader.Close();
-                    myCon.Close();
                 }
+                myCon.Close();
             }
 
             return new JsonResult(dataTable);
@@ -60,7 +64,7 @@ namespace EmployeeEnviroment.Controllers
             DataTable dataTable = new DataTable("Department");
 
             //Get data using connection context:
-            using (myCon = new SqlConnection(sqlSource))
+            using (myCon)
             {
                 myCon.Open();
                 using (mySqlCommand = new SqlCommand("Select_one_Department", myCon))
@@ -72,8 +76,8 @@ namespace EmployeeEnviroment.Controllers
                     dataTable.Load(mySqlReader); //Load the data in the table
 
                     mySqlReader.Close();
-                    myCon.Close();
                 }
+                myCon.Close();
             }
 
             return new JsonResult(dataTable);
@@ -82,7 +86,7 @@ namespace EmployeeEnviroment.Controllers
         [HttpPost]
         public StatusCodeResult Post(Department department) 
         {
-            using (myCon = new SqlConnection(sqlSource))
+            using (myCon)
             {
                 myCon.Open();
                 using (mySqlCommand = new SqlCommand("Insert_Department", myCon))
@@ -91,73 +95,84 @@ namespace EmployeeEnviroment.Controllers
                     mySqlCommand.CommandType = CommandType.StoredProcedure;
                     mySqlCommand.Parameters.AddWithValue("@Name", department.DepartmentName);
 
-                    try
-                    {
-                        mySqlCommand.ExecuteNonQuery();
-                        myCon.Close();
-                        return Ok(); 
-                    }
-                    catch (SqlException)
-                    {
-                        return BadRequest();
-                        throw;
-                    }
+                    mySqlCommand.ExecuteNonQuery();
                 }
+                myCon.Close();
             }
+
+            return Ok(); 
         }
 
         [HttpPut]
-        public JsonResult Put(Department department) 
+        public StatusCodeResult Put(Department department) 
         {
-            using (myCon = new SqlConnection(sqlSource))
+            using (myCon)
             {
                 myCon.Open();
-                using (mySqlCommand = new SqlCommand("Update_Department", myCon))
-                {
-                    //Using Stored Procedures, update a department in the db
-                    mySqlCommand.CommandType = CommandType.StoredProcedure;
-                    mySqlCommand.Parameters.AddWithValue("@Target", department.DepartmentId);
-                    mySqlCommand.Parameters.AddWithValue("@Name", department.DepartmentName);
+                if (isDepartmentExisting(department.DepartmentId))
+                {                    
+                    using (mySqlCommand = new SqlCommand("Update_Department", myCon))
+                    {
+                        //Using Stored Procedures, update a department in the db
+                        mySqlCommand.CommandType = CommandType.StoredProcedure;
+                        mySqlCommand.Parameters.AddWithValue("@Target", department.DepartmentId);
+                        mySqlCommand.Parameters.AddWithValue("@Name", department.DepartmentName);
 
-                    try
-                    {
                         mySqlCommand.ExecuteNonQuery();
-                        myCon.Close();
-                        return Get(); 
-                    }
-                    catch (SqlException)
-                    {
-                        return new JsonResult("Something went worng!!");
-                        throw;
                     }
                 }
+                myCon.Close();
             }
+
+            return Ok();
         }
 
         [HttpDelete("{id}")]
-        public JsonResult Delete(int id) 
+        public StatusCodeResult Delete(int id) 
         {
-            using (myCon = new SqlConnection(sqlSource))
+            using (myCon)
             {
                 myCon.Open();
-                using (mySqlCommand = new SqlCommand("Delete_Department", myCon))
-                {
-                    mySqlCommand.CommandType = CommandType.StoredProcedure;
-                    mySqlCommand.Parameters.AddWithValue("@Target", id);
-
-                    try
+                
+                if (isDepartmentExisting(id))
+                {                    
+                    using (mySqlCommand = new SqlCommand("Delete_Department", myCon))
                     {
+                        mySqlCommand.CommandType = CommandType.StoredProcedure;
+                        mySqlCommand.Parameters.AddWithValue("@Target", id);
                         mySqlCommand.ExecuteNonQuery();
-                        myCon.Close();
-                        return Get(); 
-                    }
-                    catch (SqlException)
-                    {
-                        return new JsonResult("Something went worng!!");
-                        throw;
                     }
                 }
+
+                myCon.Close();
             }
+
+            return Ok();
+        }
+
+        // Algorimth for check if exists a department in database
+        private bool isDepartmentExisting(int id) {
+            byte exists = 0;
+
+            using (mySqlCommand = new SqlCommand($"select count(*) as [Exists] from Department where DepartmentId = {id}", myCon))
+            {
+                mySqlCommand.CommandType = CommandType.Text;
+                mySqlReader = mySqlCommand.ExecuteReader();
+                
+                while(mySqlReader.Read()) 
+                {
+                    exists = Convert.ToByte(mySqlReader["Exists"].ToString());
+                }
+
+                mySqlReader.Close();
+            }
+            
+            if (exists > 0)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
