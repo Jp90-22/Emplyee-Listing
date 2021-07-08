@@ -161,7 +161,7 @@ namespace EmployeeEnviroment.Controllers
                 
                 while(mySqlReader.Read()) 
                 {
-                    exists = Convert.ToByte(mySqlReader["Exists"].ToString());
+                    exists = Convert.ToByte(mySqlReader["Exists"]);
                 }
 
                 mySqlReader.Close();

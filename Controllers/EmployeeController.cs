@@ -21,17 +21,21 @@ namespace EmployeeEnviroment.Controllers
         //Tools and configurations
         private readonly IConfiguration _configuration;
         private readonly IWebHostEnvironment _enviroment;
-        private readonly string sqlSource;
-        public SqlConnection myCon;
+        private readonly ILogger _logger; // Use this for testing
+        private readonly string  sqlSource;
+        public readonly SqlConnection myCon;
         public SqlCommand mySqlCommand;
         public SqlDataReader mySqlReader;
 
         //Dependency Injection
-        public EmployeeController(IConfiguration config, IWebHostEnvironment env)
+        public EmployeeController(IConfiguration config, IWebHostEnvironment env, ILogger<DepartmentController> logger)
         {
             _configuration = config;
             _enviroment = env;
+            _logger = logger;
+
             sqlSource = _configuration.GetConnectionString("EmployeeAppCon"); //Setting the connection string by dependency injection
+            myCon = new SqlConnection(sqlSource);
         }
 
         [HttpGet]
@@ -40,7 +44,7 @@ namespace EmployeeEnviroment.Controllers
             DataTable dataTable = new DataTable("Employee");
 
             //Get data using connection context:
-            using (myCon = new SqlConnection(sqlSource))
+            using (myCon)
             {
                 myCon.Open();
                 using (mySqlCommand = new SqlCommand("Select_Employee", myCon))
@@ -51,8 +55,8 @@ namespace EmployeeEnviroment.Controllers
                     dataTable.Load(mySqlReader); //Load the data in the table
 
                     mySqlReader.Close();
-                    myCon.Close();
                 }
+                myCon.Close();
             }
 
             return new JsonResult(dataTable);
@@ -64,7 +68,7 @@ namespace EmployeeEnviroment.Controllers
             DataTable dataTable = new DataTable("Employee");
 
             //Get data using connection context:
-            using (myCon = new SqlConnection(sqlSource))
+            using (myCon)
             {
                 myCon.Open();
                 using (mySqlCommand = new SqlCommand("Select_one_Employee", myCon))
@@ -76,103 +80,11 @@ namespace EmployeeEnviroment.Controllers
                     dataTable.Load(mySqlReader); //Load the data in the table
 
                     mySqlReader.Close();
-                    myCon.Close();
                 }
+                myCon.Close();
             }
 
             return new JsonResult(dataTable);
-        }
-
-        [HttpPost]
-        public StatusCodeResult Post(Employee employee)
-        {
-            using (myCon = new SqlConnection(sqlSource))
-            {
-                myCon.Open();
-                using (mySqlCommand = new SqlCommand("Insert_Employee", myCon))
-                {
-                    //Using Stored Procedures, add a new department in the db
-                    mySqlCommand.CommandType = CommandType.StoredProcedure;
-                    mySqlCommand.Parameters.AddWithValue("@Name", employee.EmployeeName);
-                    mySqlCommand.Parameters.AddWithValue("@Department", employee.Department);
-                    mySqlCommand.Parameters.AddWithValue("@JoinDate", employee.DateOfJoining);
-                    mySqlCommand.Parameters.AddWithValue("@Photo", employee.PhotoFileName);
-
-                    mySqlCommand.ExecuteNonQuery();
-                    myCon.Close();
-                    return StatusCode(200);
-                }
-            }
-        }
-
-        [HttpPut]
-        public JsonResult Put(Employee employee)
-        {
-            using (myCon = new SqlConnection(sqlSource))
-            {
-                myCon.Open();
-                using (mySqlCommand = new SqlCommand("Update_Employee", myCon))
-                {
-                    //Using Stored Procedures, update a department in the db
-                    mySqlCommand.CommandType = CommandType.StoredProcedure;
-                    mySqlCommand.Parameters.AddWithValue("@Target", employee.EmployeeId);
-                    mySqlCommand.Parameters.AddWithValue("@Name", employee.EmployeeName);
-                    mySqlCommand.Parameters.AddWithValue("@Department", employee.Department);
-                    mySqlCommand.Parameters.AddWithValue("@JoinDate", employee.DateOfJoining);
-                    mySqlCommand.Parameters.AddWithValue("@Photo", employee.PhotoFileName);
-
-
-                    mySqlCommand.ExecuteNonQuery();
-                    myCon.Close();
-                    return Get();
-                }
-            }
-        }
-
-        [HttpDelete("{id}")]
-        public JsonResult Delete(int id)
-        {
-            using (myCon = new SqlConnection(sqlSource))
-            {
-                myCon.Open();
-                using (mySqlCommand = new SqlCommand("Delete_Employee", myCon))
-                {
-                    mySqlCommand.CommandType = CommandType.StoredProcedure;
-                    mySqlCommand.Parameters.AddWithValue("@Target", id);
-
-                    mySqlCommand.ExecuteNonQuery();
-                    myCon.Close();
-                    return Get();
-                }
-            }
-        }
-
-        // Save photo files API method
-        [Route("[action]")]
-        [HttpPost]
-        public JsonResult SaveFiles()
-        {
-            try
-            {
-                var httpRequest = Request.Form; // Convert the request into form
-                var postedFile = httpRequest.Files[0]; //  Get the first file of the request
-                string fileName = postedFile.FileName; 
-                var physicalPath = _enviroment.ContentRootPath + "/Photos/" + fileName;
-
-                //Create a stream for new file and copy postedFile to that stream
-                using (var stream = new FileStream(physicalPath, FileMode.Create))
-                {
-                    postedFile.CopyTo(stream);
-                }
-
-                return new JsonResult(fileName);
-
-            }
-            catch (Exception)
-            {
-                return new JsonResult("anonymous.jpg");
-                throw;
-            }
         }
 
         // Get all employee's department names
@@ -183,7 +95,7 @@ namespace EmployeeEnviroment.Controllers
             DataTable dataTable = new DataTable("Department Names");
 
             //Get data using connection context:
-            using (myCon = new SqlConnection(sqlSource))
+            using (myCon)
             {
                 myCon.Open();
                 using (mySqlCommand = new SqlCommand("Select_All_Employee_DepartmentNames", myCon))
@@ -194,11 +106,135 @@ namespace EmployeeEnviroment.Controllers
                     dataTable.Load(mySqlReader); //Load the data in the table
 
                     mySqlReader.Close();
-                    myCon.Close();
                 }
+                myCon.Close();
             }
 
             return new JsonResult(dataTable);
+        }
+
+        [HttpPost]
+        public StatusCodeResult Post(Employee employee)
+        {
+            using (myCon)
+            {
+                myCon.Open();
+                using (mySqlCommand = new SqlCommand("Insert_Employee", myCon))
+                {
+                    //Using Stored Procedures, add a new department in the db
+                    mySqlCommand.CommandType = CommandType.StoredProcedure;
+                    mySqlCommand.Parameters.AddWithValue("@Name", employee.EmployeeName);
+                    mySqlCommand.Parameters.AddWithValue("@Department", employee.Department);
+                    mySqlCommand.Parameters.AddWithValue("@JoinDate", String.IsNullOrWhiteSpace(employee.DateOfJoining)? DBNull.Value : employee.DateOfJoining);
+                    mySqlCommand.Parameters.AddWithValue("@Photo", String.IsNullOrWhiteSpace(employee.PhotoFileName)? DBNull.Value : employee.PhotoFileName);
+
+                    mySqlCommand.ExecuteNonQuery();
+                }
+                myCon.Close();
+            }
+
+            return Ok();
+        }
+
+        // Save photo files API method
+        [Route("[action]")]
+        [HttpPost]
+        public JsonResult SavePhoto()
+        {
+            try
+            {
+                var httpRequest = Request.Form; // Convert the request into form
+                var postedPhoto = httpRequest.Files[0]; //  Get the first file of the request
+                string photoName = postedPhoto.FileName; 
+                var physicalPath = _enviroment.ContentRootPath + "/Photos/" + photoName;
+
+                //Create a stream for new file and copy postedFile to that stream
+                using (var stream = new FileStream(physicalPath, FileMode.Create))
+                {
+                    postedPhoto.CopyTo(stream);
+                }
+                
+                return new JsonResult(photoName);
+            }
+            catch (Exception)
+            {
+                return new JsonResult("anonymous.jpg");
+                throw;
+            }
+        }
+
+        [HttpPut]
+        public StatusCodeResult Put(Employee employee)
+        {
+            using (myCon)
+            {
+                myCon.Open();
+                if (isEmployeeExisting(employee.EmployeeId))
+                {
+                    using (mySqlCommand = new SqlCommand("Update_Employee", myCon))
+                    {
+                        //Using Stored Procedures, update a department in the db
+                        mySqlCommand.CommandType = CommandType.StoredProcedure;
+                        mySqlCommand.Parameters.AddWithValue("@Target", employee.EmployeeId);
+                        mySqlCommand.Parameters.AddWithValue("@Name", employee.EmployeeName);
+                        mySqlCommand.Parameters.AddWithValue("@Department", employee.Department);
+                        mySqlCommand.Parameters.AddWithValue("@JoinDate", String.IsNullOrWhiteSpace(employee.DateOfJoining)? DBNull.Value : employee.DateOfJoining);
+                        mySqlCommand.Parameters.AddWithValue("@Photo", String.IsNullOrWhiteSpace(employee.PhotoFileName)? DBNull.Value : employee.PhotoFileName);
+
+                        mySqlCommand.ExecuteNonQuery();
+                    }
+                }
+                myCon.Close();
+            }
+
+            return Ok();
+        }
+
+        [HttpDelete("{id}")]
+        public StatusCodeResult Delete(int id)
+        {
+            using (myCon)
+            {
+                myCon.Open();
+                if (isEmployeeExisting(id))
+                {
+                    using (mySqlCommand = new SqlCommand("Delete_Employee", myCon))
+                    {
+                        mySqlCommand.CommandType = CommandType.StoredProcedure;
+                        mySqlCommand.Parameters.AddWithValue("@Target", id);
+
+                        mySqlCommand.ExecuteNonQuery();
+                    }
+                }
+                myCon.Close();
+            }
+
+            return Ok();
+        }
+
+        // Algorimth for check if exists a employee in database
+        private bool isEmployeeExisting(int id) {
+            byte exists = 0;
+
+            using (mySqlCommand = new SqlCommand($"select count(*) as [Exists] from Employee where EmployeeId = {id}", myCon))
+            {
+                mySqlCommand.CommandType = CommandType.Text;
+                mySqlReader = mySqlCommand.ExecuteReader();
+                
+                while(mySqlReader.Read()) 
+                {
+                    exists = Convert.ToByte(mySqlReader["Exists"]);
+                }
+
+                mySqlReader.Close();
+            }
+            
+            if (exists > 0)
+            {
+                return true;
+            }
+
+            return false;
         }
     }
 }
