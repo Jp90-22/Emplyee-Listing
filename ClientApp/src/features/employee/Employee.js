@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Table, Button, ButtonToolbar, ButtonGroup} from 'reactstrap';
-import AddEmpModal from './PopUp Modals/AddEmpModal';
-import EditEmpModal from './PopUp Modals/EditEmpModal';
+import AddEmpModal from './PopUp modals/AddEmpModal';
+import EditEmpModal from './PopUp modals/EditEmpModal';
 
 export default class Employee extends React.Component {
     constructor(props) {

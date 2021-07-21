@@ -2,10 +2,10 @@ import * as React from 'react';
 import { BrowserRouter as Router , Route, Switch } from 'react-router-dom';
 
 //Components
-import Navigation from './components/Navigation';
-import Home from './components/Home';
-import Department from './components/Department';
-import Employee from './components/Employee';
+import Navigation from './app/Navigation';
+import Home from './app/Home';
+import Department from './features/department/Department';
+import Employee from './features/employee/Employee';
 
 export default () => (
     <div className="container">
