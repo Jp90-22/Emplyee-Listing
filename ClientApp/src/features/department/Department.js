@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { Table, Button, ButtonToolbar, ButtonGroup} from 'reactstrap';
-import AddDeptModal from './PopUp Modals/AddDeptModal';
-import EditDeptModal from './PopUp Modals/EditDeptModal';
+import AddDeptModal from './PopUp modals/AddDeptModal';
+import EditDeptModal from './PopUp modals/EditDeptModal';
 
 export default class Department extends React.Component {
     constructor(props) {
