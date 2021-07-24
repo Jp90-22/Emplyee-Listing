@@ -21,6 +21,7 @@ namespace EmployeeEnviroment
         }
 
         public IConfiguration Configuration { get; }
+        private readonly string _AllowAllOriginsPolicy = "AllowAllOrgins";
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -32,11 +33,11 @@ namespace EmployeeEnviroment
                     options.SerializerSettings.ContractResolver = new DefaultContractResolver()
             );
 
-            //Enable Cors for Allow every http request
+            //Enable Cors for Allow http request of all local origins
             services.AddCors(config => {
-                config.AddPolicy("AllowOrigin", options => 
+                config.AddPolicy(_AllowAllOriginsPolicy, options => 
                     //Allow the origin and its requests
-                    options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader());
+                    options.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
             });
 
             // In production, the React files will be served from this directory
@@ -52,9 +53,6 @@ namespace EmployeeEnviroment
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
-                app.UseCors(options => 
-                    options.AllowAnyOrigin().AllowAnyMethod().AllowAnyHeader()
-                );
             }
             else
             {
@@ -85,6 +83,11 @@ namespace EmployeeEnviroment
             app.UseSpaStaticFiles();
         
             app.UseRouting();
+
+            if (env.IsDevelopment())
+            {
+                app.UseCors(_AllowAllOriginsPolicy);
+            }
 
             app.UseEndpoints(endpoints =>
             {
