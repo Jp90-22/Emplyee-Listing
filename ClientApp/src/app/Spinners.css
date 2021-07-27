@@ -3,10 +3,11 @@
     display: flex;
     justify-content: center;
     align-items: center;
+    box-sizing: border-box;
 }
 
 .Absolute-Centralizer-container {
-    position: absolute;
+    position: fixed;
     height: 100%;
     width: 100%;
     top: 0%;
