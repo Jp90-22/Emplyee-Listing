@@ -1,7 +1,8 @@
 import { 
     createSlice,
     createEntityAdapter,
-    createAsyncThunk
+    createAsyncThunk,
+    createSelector
 } from '@reduxjs/toolkit'
 
 // Entity adapter
@@ -129,6 +130,9 @@ const departmentsSlice = createSlice({
 export const { selectAll: getDeparments, selectById: lookDepartmentById } = 
     deparmentsAdapter.getSelectors(state => state.Department)
 
-export const selectStateStatus = (state) => state.Department.status 
+export const selectStateStatus = createSelector(
+    (state) => state.Department.status,
+    (status) => status
+)
 
 export default departmentsSlice.reducer
