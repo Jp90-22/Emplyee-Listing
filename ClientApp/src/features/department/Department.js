@@ -142,7 +142,7 @@ const Department = () => {
     const departmentStateStatus = useSelector(selectStateStatus)
     const error = useSelector(state => state.Department.error)
 
-    const [canGetDepartments, setCanGetDepartments] = useState(true)
+    const [canGetDepartments, setCanGetDepartments] = useState(false)
     const [modalAddOpened, setModalAddOpened] = useState(false)
     const [modalEditOpened, setModalEditOpened] = useState(false)
     const [departmentToEdit, setDepartmentToEdit] = useState(null)
@@ -163,7 +163,7 @@ const Department = () => {
     }
 
     const exitEditMode = () => { 
-        setModalAddOpened(!modalAddOpened)
+        setModalEditOpened(!modalEditOpened)
         setCanGetDepartments(true) 
     }
 
@@ -176,6 +176,10 @@ const Department = () => {
     }
 
     // Dispatching, getting, and redering data
+    useEffect(() => {
+        setCanGetDepartments(true)
+    }, [])
+
     useEffect(() => {
         if (canGetDepartments) {
             dispatch(getDepartmentsThunk())
@@ -233,7 +237,7 @@ const Department = () => {
             
             {/* Pop up Add modal */}
             <AddDeptModal isOpen={modalAddOpened} toggle={exitAddMode} />
-            {/* <EditDeptModal isOpen={modalEditOpened} toggle={exitEditMode} targetId={departmentToEdit} /> */}
+            <EditDeptModal isOpen={modalEditOpened} toggle={exitEditMode} targetid={departmentToEdit} />
 
             {(departmentStateStatus === 'pending')? <AbsoluteCentralizedSpinner /> : null}
         </div>

@@ -100,6 +100,7 @@ const AddDeptModal = (props) => {
     const addNewDepartment = (e) => {
         e.preventDefault()
         dispatch(postDepartmentThunk({ DepartmentName: inputDptName}))
+        setInputDptName('')
         props.toggle()
     }
 
