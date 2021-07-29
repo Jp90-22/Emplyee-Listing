@@ -96,7 +96,6 @@ export const savePhotoThunk = createAsyncThunk(
         const responseData = await
             fetch(process.env.REACT_APP_API + "employee/SavePhoto", {
                 method: 'POST',
-                headers: { "Content-Type": 'multipart/form-data' },
                 body: photoFormData
             })
             .then(response => response.json())

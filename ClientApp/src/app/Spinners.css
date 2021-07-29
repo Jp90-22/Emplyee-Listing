@@ -6,14 +6,21 @@
     box-sizing: border-box;
 }
 
-.Absolute-Centralizer-container {
-    position: fixed;
+.Fixed-Centralizer-container, .Absolute-Centralizer-container {
     height: 100%;
     width: 100%;
     top: 0%;
     left: 0%;
     right: 0%;
     bottom: 0%;
+}
+
+.Fixed-Centralizer-container {
+    position: fixed;
+}
+
+.Absolute-Centralizer-container {
+    position: absolute;
 }
 
 .Opacity-Container {
