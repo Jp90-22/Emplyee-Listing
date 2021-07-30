@@ -244,7 +244,7 @@ const Employee = () => {
             
             {/* Pop up Add modal */}
             <AddEmpModal isOpen={modalAddOpened} toggle={exitAddMode} />
-            {/* <EditEmpModal isOpen={modalEditOpened} toggle={exitEditMode} targetid={employeeToEdit} /> */}
+            <EditEmpModal isOpen={modalEditOpened} toggle={exitEditMode} targetid={employeeToEdit} />
 
             {(employeeStateStatus === 'pending')? <AbsoluteCentralizedSpinner /> : null}
         </div>

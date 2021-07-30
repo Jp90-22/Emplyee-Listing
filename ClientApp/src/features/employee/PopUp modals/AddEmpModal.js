@@ -170,8 +170,8 @@ const AddEmpModal = (props) => {
     useEffect(() => ReloadDepartments(), [ReloadDepartments])
     
     const onInputEmpNameChange = (e) => setInputEmpName(e.target.value)
-    const onInputEmpDateOfJoiningChange = (e) => setInputEmpDateOfJoining(e.target.value)
     const onInputEmpDepartmentChange = (e) => setInputEmpDepartment(e.target.value)
+    const onInputEmpDateOfJoiningChange = (e) => setInputEmpDateOfJoining(e.target.value)
 
     const onChangePhoto = (e) => {
         e.preventDefault();
@@ -197,8 +197,8 @@ const AddEmpModal = (props) => {
         }))
         
         setInputEmpName('')
-        setInputEmpDateOfJoining('')
         setInputEmpDepartment('')
+        setInputEmpDateOfJoining('')
         setPhotoThumbnail("anonymous.jpg")
 
         props.toggle()
@@ -292,7 +292,7 @@ const AddEmpModal = (props) => {
                         </Row>
                         <Row>
                             <Col className="mt-3" sm={6}>
-                                <Button color="info">Add department</Button>
+                                <Button color="info">Add employee</Button>
                             </Col>
                         </Row>
                     </Form>

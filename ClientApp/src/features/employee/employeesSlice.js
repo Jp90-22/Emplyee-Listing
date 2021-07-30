@@ -181,7 +181,7 @@ const employeesSlice = createSlice({
 })
 
 // Exports:
-export const { selectAll: getEmployees, selectById: lookEmployeesById } = 
+export const { selectAll: getEmployees, selectById: lookEmployeeById } = 
     employeesAdapter.getSelectors(state => state.Employee)
 
 export const selectStateStatus = createSelector(
