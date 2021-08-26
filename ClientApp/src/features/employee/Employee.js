@@ -15,6 +15,7 @@ import {
 } from 'reactstrap';
 import { AbsoluteCentralizedSpinner } from '../../app/Spinners'
 import FloatingButtons from '../../app/FloatingButtons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import AddEmpModal from './PopUp modals/AddEmpModal';
 import EditEmpModal from './PopUp modals/EditEmpModal';
 
@@ -84,8 +85,21 @@ const Employee = () => {
                     <td>
                         <ButtonToolbar>
                             <ButtonGroup size="sm">
-                                <Button color="info" outline onClick={() => enterEditMode(employee.EmployeeId)}>Edit</Button>
-                                <Button color="danger" outline onClick={() => enterDeleteMode(employee.EmployeeId)}>Delete</Button>
+                                <Button 
+                                    color="info" 
+                                    outline 
+                                    onClick={() => enterEditMode(employee.EmployeeId)}
+                                >
+                                    <FontAwesomeIcon icon={['fas', 'user-edit']} />
+                                </Button>
+                                
+                                <Button 
+                                    color="danger" 
+                                    outline 
+                                    onClick={() => enterDeleteMode(employee.EmployeeId)}
+                                >
+                                    <FontAwesomeIcon icon={['fas', 'minus-circle']} />
+                                </Button>
                             </ButtonGroup>
                         </ButtonToolbar>
                     </td>

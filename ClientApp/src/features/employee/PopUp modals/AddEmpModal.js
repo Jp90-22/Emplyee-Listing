@@ -23,6 +23,7 @@ import {
     Button
 } from 'reactstrap';
 import { InputAlongsideSpinner, PhotoSpinner } from '../../../app/Spinners'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 
 const AddEmpModal = (props) => {
     const dispatch = useDispatch()
@@ -144,7 +145,7 @@ const AddEmpModal = (props) => {
                                             size="sm"
                                             onClick={ReloadDepartments}
                                         >
-                                            <i className="fas fa-redo-alt" title="Reload department names"></i>
+                                            <FontAwesomeIcon icon={['fas', 'redo-alt']} />
                                         </Button>
                                     </div>
                                 </FormGroup>

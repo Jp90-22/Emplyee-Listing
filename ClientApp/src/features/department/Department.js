@@ -15,6 +15,7 @@ import {
 } from 'reactstrap';
 import { AbsoluteCentralizedSpinner } from '../../app/Spinners'
 import FloatingButtons from '../../app/FloatingButtons'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import AddDeptModal from './PopUp modals/AddDeptModal';
 import EditDeptModal from './PopUp modals/EditDeptModal';
 
@@ -82,8 +83,21 @@ const Department = () => {
                     <td>
                         <ButtonToolbar>
                             <ButtonGroup size="sm">
-                                <Button color="info" outline onClick={() => enterEditMode(department.DepartmentId)}>Edit</Button>
-                                <Button color="danger" outline onClick={() => enterDeleteMode(department.DepartmentId)}>Delete</Button>
+                                <Button 
+                                    color="info" 
+                                    outline 
+                                    onClick={() => enterEditMode(department.DepartmentId)}
+                                >
+                                    <FontAwesomeIcon icon={['fas', 'edit']} />
+                                </Button>
+
+                                <Button 
+                                    color="danger" 
+                                    outline 
+                                    onClick={() => enterDeleteMode(department.DepartmentId)}
+                                >
+                                    <FontAwesomeIcon icon={['fas', 'trash-alt']} />
+                                </Button>
                             </ButtonGroup>
                         </ButtonToolbar>
                     </td>
