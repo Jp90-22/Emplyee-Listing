@@ -17,8 +17,8 @@ export default () => (
 
             <Switch>
                 <Route path="/" component={Home} exact />
-                <Route path="/department" component={Department} />
-                <Route path="/employee" component={Employee} />
+                <Route path="/department" component={Department} exact />
+                <Route path="/employee" component={Employee} exact />
             </Switch>
         </Router>
 

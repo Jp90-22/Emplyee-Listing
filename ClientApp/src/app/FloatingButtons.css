@@ -1,27 +1,3 @@
-.label-container{
-    position:fixed;
-    bottom:48px;
-    right:105px;
-    display:table;
-    visibility: hidden;
-}
-
-.label-text{
-    color:#FFF;
-    background:rgba(51,51,51,0.5);
-    display:table-cell;
-    vertical-align:middle;
-    padding:10px;
-    border-radius:3px;
-}
-
-.label-arrow{
-    display:table-cell;
-    vertical-align:middle;
-    color:#333;
-    opacity:0.5;
-}
-
 .float-buttons-menu{
     position:fixed;
     width:60px;

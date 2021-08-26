@@ -120,7 +120,7 @@ const Employee = () => {
                 </tbody>
             </Table>
             
-            <FloatingButtons onClicks={[enterAddMode, () => dispatch(getEmployeesThunk())]} />
+            <FloatingButtons addAction={enterAddMode} reloadAction={() => dispatch(getEmployeesThunk())} />
 
             {/* Pop up Add modal */}
             <AddEmpModal isOpen={modalAddOpened} toggle={exitAddMode} />

@@ -14,6 +14,7 @@ import {
     ButtonGroup
 } from 'reactstrap';
 import { AbsoluteCentralizedSpinner } from '../../app/Spinners'
+import FloatingButtons from '../../app/FloatingButtons'
 import AddDeptModal from './PopUp modals/AddDeptModal';
 import EditDeptModal from './PopUp modals/EditDeptModal';
 
@@ -96,7 +97,7 @@ const Department = () => {
     }
 
     return (
-        <div className="mt-5 d-flex flex-column justify-content-center">
+        <div className="my-5 d-flex flex-column justify-content-center">
             <h2 className="txt-secondary">
                 Table of Departments
             </h2>
@@ -115,8 +116,8 @@ const Department = () => {
                 </tbody>
             </Table>
             
-            <Button className="mb-5" color="primary" size="lg" onClick={enterAddMode}>Add a new department</Button> 
-            
+            <FloatingButtons addAction={enterAddMode} reloadAction={() => dispatch(getDepartmentsThunk())} />
+
             {/* Pop up Add modal */}
             <AddDeptModal isOpen={modalAddOpened} toggle={exitAddMode} />
             <EditDeptModal isOpen={modalEditOpened} toggle={exitEditMode} targetid={departmentToEdit} />
