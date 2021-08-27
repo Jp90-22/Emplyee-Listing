@@ -39,7 +39,7 @@ ul#buttonsList li button{
     outline: none;
 }
 
-#reloadButton :active {
+#reloadButton:active > svg {
     animation: rotate-in 0.3s;
 }
 
@@ -62,11 +62,11 @@ span#buttons-menu:hover + ul{
     animation: scale-in 0.5s;
 }
 
-span#buttons-menu i{
+span#buttons-menu svg{
     animation: rotate-in 0.5s;
 }
 
-span#buttons-menu:hover > i{
+span#buttons-menu:hover > svg{
     animation: rotate-out 0.5s;
 }
 

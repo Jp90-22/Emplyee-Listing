@@ -20,7 +20,8 @@ import {
     FormGroup,
     Label, 
     Input, 
-    Button
+    Button,
+    UncontrolledTooltip
 } from 'reactstrap';
 import { InputAlongsideSpinner, PhotoSpinner } from '../../../app/Spinners'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -138,6 +139,7 @@ const AddEmpModal = (props) => {
                                             {departmentOptions}
                                         </Input>
                                         <Button 
+                                            id="reloadDptBtn"
                                             className="ml-2"
                                             type="button" 
                                             outline 
@@ -147,6 +149,9 @@ const AddEmpModal = (props) => {
                                         >
                                             <FontAwesomeIcon icon={['fas', 'redo-alt']} />
                                         </Button>
+                                        <UncontrolledTooltip target="reloadDptBtn" placement="top">
+                                            Reload department names
+                                        </UncontrolledTooltip>
                                     </div>
                                 </FormGroup>
 

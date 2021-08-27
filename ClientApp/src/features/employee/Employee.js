@@ -11,7 +11,8 @@ import {
     Table, 
     Button, 
     ButtonToolbar, 
-    ButtonGroup
+    ButtonGroup,
+    UncontrolledTooltip
 } from 'reactstrap';
 import { AbsoluteCentralizedSpinner } from '../../app/Spinners'
 import FloatingButtons from '../../app/FloatingButtons'
@@ -85,7 +86,8 @@ const Employee = () => {
                     <td>
                         <ButtonToolbar>
                             <ButtonGroup size="sm">
-                                <Button 
+                                <Button
+                                    id={'editItemBtn' + idx}
                                     color="info" 
                                     outline 
                                     onClick={() => enterEditMode(employee.EmployeeId)}
@@ -93,13 +95,23 @@ const Employee = () => {
                                     <FontAwesomeIcon icon={['fas', 'user-edit']} />
                                 </Button>
                                 
-                                <Button 
+                                <Button
+                                    id={'delItemBtn' + idx}
                                     color="danger" 
                                     outline 
                                     onClick={() => enterDeleteMode(employee.EmployeeId)}
                                 >
                                     <FontAwesomeIcon icon={['fas', 'minus-circle']} />
                                 </Button>
+
+                                {/* Tooltips */}
+                                <UncontrolledTooltip target={'editItemBtn' + idx} autohide={false} placement="left">
+                                    Edit item
+                                </UncontrolledTooltip>
+
+                                <UncontrolledTooltip target={'delItemBtn' + idx} autohide={false} placement="bottom">
+                                    Delete item
+                                </UncontrolledTooltip>
                             </ButtonGroup>
                         </ButtonToolbar>
                     </td>
