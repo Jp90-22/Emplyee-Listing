@@ -13,6 +13,7 @@ const employeesAdapter = createEntityAdapter({
 const initialState = employeesAdapter.getInitialState({
     status: "idle", // idle || pending || rejected
     photoStatus: "idle", // idle || sending || rejected
+    dptNamesStatus: "idle", // idle || pending || rejected
     error: null
 })
 
@@ -157,13 +158,13 @@ const employeesSlice = createSlice({
         },
         // Get all Departments names actions and reducers:
         [getAllDeparmentsNamesThunk.pending]: (state, action) => {
-            state.status = 'pending'
+            state.dptNamesStatus = 'pending'
         },
         [getAllDeparmentsNamesThunk.fulfilled]: (state, action) => {
-            state.status = 'idle'
+            state.dptNamesStatus = 'idle'
         },
         [getAllDeparmentsNamesThunk.rejected]: (state, action) => {
-            state.status = 'rejected'
+            state.dptNamesStatus = 'rejected'
             state.error = action.error
         },
         // Save photo actions and reducers:
@@ -192,6 +193,11 @@ export const selectStateStatus = createSelector(
 export const selectPhotoStatus = createSelector(
     (state) => state.Employee.photoStatus,
     (photoStatus) => photoStatus
+)
+
+export const selectDptNamesStatus = createSelector(
+    (state) => state.Employee.dptNamesStatus,
+    (dptNamesStatus) => dptNamesStatus
 )
 
 export default employeesSlice.reducer

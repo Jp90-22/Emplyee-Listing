@@ -5,9 +5,9 @@ import {
     updateEmployeeThunk, 
     getAllDeparmentsNamesThunk, 
     savePhotoThunk,
-    selectStateStatus,
     selectPhotoStatus,
-    lookEmployeeById
+    lookEmployeeById,
+    selectDptNamesStatus
 } from '../employeesSlice'
 
 import {
@@ -41,7 +41,7 @@ const EditEmpModal = (props) => {
         PhotoFileName 
     } = employeeToEdit || ''
     
-    const employeeStateStatus = useSelector(selectStateStatus)
+    const dptNamesStatus = useSelector(selectDptNamesStatus)
     const photoStatus = useSelector(selectPhotoStatus)
     const error = useSelector(state => state.Employee.error)
 
@@ -115,7 +115,7 @@ const EditEmpModal = (props) => {
         props.toggle()
     }
 
-    if (employeeStateStatus === 'rejected' || photoStatus === 'rejected') {
+    if (dptNamesStatus === 'rejected' || photoStatus === 'rejected') {
         alert("Something went wrong!\n" + error.message)
     }
 
@@ -161,7 +161,7 @@ const EditEmpModal = (props) => {
                                 <FormGroup>
                                     <Label for="inputEmployeeDepartment">
                                         Department: 
-                                        {(employeeStateStatus === 'pending')? <InputAlongsideSpinner /> : null}
+                                        {(dptNamesStatus === 'pending')? <InputAlongsideSpinner /> : null}
                                     </Label>
                                     <div className="d-flex">
                                         <Input 
@@ -182,6 +182,7 @@ const EditEmpModal = (props) => {
                                             outline 
                                             color="info"
                                             size="sm"
+                                            disabled={dptNamesStatus === 'pending'}
                                             onClick={ReloadDepartments}
                                         >
                                             <FontAwesomeIcon icon={['fas', 'redo-alt']} />

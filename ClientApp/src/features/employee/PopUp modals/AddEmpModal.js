@@ -5,8 +5,8 @@ import {
     postEmployeeThunk, 
     getAllDeparmentsNamesThunk, 
     savePhotoThunk,
-    selectStateStatus,
-    selectPhotoStatus
+    selectPhotoStatus,
+    selectDptNamesStatus
 } from '../employeesSlice'
 
 import {
@@ -29,7 +29,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 const AddEmpModal = (props) => {
     const dispatch = useDispatch()
 
-    const employeeStateStatus = useSelector(selectStateStatus)
+    const dptNamesStatus = useSelector(selectDptNamesStatus)
     const photoStatus = useSelector(selectPhotoStatus)
     const error = useSelector(state => state.Employee.error)
 
@@ -91,7 +91,7 @@ const AddEmpModal = (props) => {
         props.toggle()
     }
 
-    if (employeeStateStatus === 'rejected' || photoStatus === 'rejected') {
+    if (dptNamesStatus === 'rejected' || photoStatus === 'rejected') {
         alert("Something went wrong!\n" + error.message)
     }
 
@@ -125,7 +125,7 @@ const AddEmpModal = (props) => {
                                 <FormGroup>
                                     <Label for="inputEmployeeDepartment">
                                         Department: 
-                                        {(employeeStateStatus === 'pending')? <InputAlongsideSpinner /> : null}
+                                        {(dptNamesStatus === 'pending')? <InputAlongsideSpinner /> : null}
                                     </Label>
                                     <div className="d-flex">
                                         <Input 
@@ -145,6 +145,7 @@ const AddEmpModal = (props) => {
                                             outline 
                                             color="info"
                                             size="sm"
+                                            disabled={dptNamesStatus === 'pending'}
                                             onClick={ReloadDepartments}
                                         >
                                             <FontAwesomeIcon icon={['fas', 'redo-alt']} />
