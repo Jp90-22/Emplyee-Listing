@@ -8,7 +8,10 @@ import {
 } from './employeesSlice'
 
 import { 
-    Table, 
+    Table,
+    Form,
+    FormGroup,
+    Input,
     Button, 
     ButtonToolbar, 
     ButtonGroup,
@@ -27,11 +30,12 @@ const Employee = () => {
     const employeeStateStatus = useSelector(selectStateStatus)
     const error = useSelector(state => state.Employee.error)
 
-    const [canGetEmployees, setCanGetEmployees] = useState(false)
+    const [canGetEmployees, setCanGetEmployees] = useState(true)
     const [modalAddOpened, setModalAddOpened] = useState(false)
     const [modalEditOpened, setModalEditOpened] = useState(false)
     const [employeeToEdit, setEmployeeToEdit] = useState(null)
-    
+    const [employeesToShow, setEmployeesToShow] = useState(employees)
+
     // Handling Popup modals events (Pop up and Pop out)
     const enterAddMode = () => { 
         setModalAddOpened(!modalAddOpened)
@@ -62,8 +66,8 @@ const Employee = () => {
 
     // Dispatching, getting, and redering data
     useEffect(() => {
-        setCanGetEmployees(true)
-    }, [])
+        setEmployeesToShow(employees)
+    }, [employees])
 
     useEffect(() => {
         if (canGetEmployees) {
@@ -72,17 +76,16 @@ const Employee = () => {
         } 
     }, [canGetEmployees, dispatch])
 
-    let tableRows
-    if (employees) {
-        tableRows = employees.map(
+    const Tbody = ({ employees }) => {
+        const trows = employees.map(
             (employee, idx) => (
                 <tr key={idx}>
                     <td>{employee.EmployeeId}</td>
                     <td>{employee.EmployeeName}</td>
                     <td>{employee.Department}</td>
                     <td>{employee.DateOfJoining}</td>
-
-                    {/* Department actions */}
+        
+                    {/* Employee actions */}
                     <td>
                         <ButtonToolbar>
                             <ButtonGroup size="sm">
@@ -103,12 +106,12 @@ const Employee = () => {
                                 >
                                     <FontAwesomeIcon icon={['fas', 'minus-circle']} />
                                 </Button>
-
+        
                                 {/* Tooltips */}
                                 <UncontrolledTooltip target={'editItemBtn' + idx} autohide={false} placement="left">
                                     Edit item
                                 </UncontrolledTooltip>
-
+        
                                 <UncontrolledTooltip target={'delItemBtn' + idx} autohide={false} placement="bottom">
                                     Delete item
                                 </UncontrolledTooltip>
@@ -118,8 +121,31 @@ const Employee = () => {
                 </tr>
             )
         )
+        
+        return (
+            <tbody>
+                {trows}
+            </tbody>
+        )
     }
-    
+
+    // Search Algorimth
+    const searchByName = (name = "") => {
+        const newEntries = employees.filter(
+            (employee) => employee.EmployeeName.toLocaleLowerCase().includes(name.toLocaleLowerCase())
+        )
+        
+        setEmployeesToShow(newEntries)
+    }
+
+    // Search handler
+    const onIptSearchChange = (e) => searchByName(e.target.value)
+
+    const onFormSearchSubmit = (e) => {
+        e.preventDefault();
+        searchByName(e.target.iptSearch.value)
+    }
+
     if (employeeStateStatus === 'rejected') {
         alert("Something went worng!\n" + error.message)
     }
@@ -129,7 +155,29 @@ const Employee = () => {
             <h2 className="txt-secondary">
                 Table of Departments
             </h2>
-                
+
+            <Form className="pb-2 w-auto" inline onSubmit={onFormSearchSubmit}>
+                <FormGroup className="w-100 justify-content-end">
+                    <div className="d-inline-flex w-50 justify-content-end">
+                        <Input
+                            id="iptSearch"
+                            className="d-inline-block" 
+                            type="text" 
+                            required
+                            onChange={onIptSearchChange}
+                            placeholder="Search item by name..." 
+                        />
+                    </div>
+                    <Button id="searchBtn" className="ml-1" type="submit" color="primary">
+                        <FontAwesomeIcon icon={['fas', 'search']} />
+                    </Button>
+
+                    <UncontrolledTooltip target="searchBtn" placement="top">
+                        Search it
+                    </UncontrolledTooltip>
+                </FormGroup>
+            </Form>
+            
             <Table striped hover bordered responsive>
                 <thead>
                     <tr>
@@ -141,9 +189,8 @@ const Employee = () => {
                     </tr>
                 </thead>
 
-                <tbody>
-                    {tableRows}
-                </tbody>
+                {(employeesToShow.length !== 0)? <Tbody employees={employeesToShow} /> 
+                        : null}
             </Table>
             
             <FloatingButtons addAction={enterAddMode} reloadAction={() => dispatch(getEmployeesThunk())} />
@@ -158,4 +205,3 @@ const Employee = () => {
 }
 
 export default Employee
-
