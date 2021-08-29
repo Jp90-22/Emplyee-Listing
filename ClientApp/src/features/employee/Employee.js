@@ -9,14 +9,12 @@ import {
 
 import { 
     Table,
-    Form,
-    FormGroup,
-    Input,
     Button, 
     ButtonToolbar, 
     ButtonGroup,
     UncontrolledTooltip
 } from 'reactstrap';
+import SearchBar from '../../app/SearchBar'
 import { AbsoluteCentralizedSpinner } from '../../app/Spinners'
 import FloatingButtons from '../../app/FloatingButtons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
@@ -76,7 +74,7 @@ const Employee = () => {
         setEmployeesToShow(employees)
     }, [employees])
 
-    const Tbody = ({ employees }) => {
+    let Tbody = ({ employees }) => {
         const tRows = employees.map(
             (employee, idx) => (
                 <tr key={idx}>
@@ -129,6 +127,13 @@ const Employee = () => {
         )
     }
 
+    Tbody = React.memo(Tbody)
+
+    // Error handler
+    if (employeeStateStatus === 'rejected') {
+        alert("Something went worng!\n" + error.message)
+    }
+
     // Search Algorimth
     const searchByName = (name = "") => {
         const newEntries = employees.filter(
@@ -146,37 +151,13 @@ const Employee = () => {
         searchByName(e.target.iptSearch.value)
     }
 
-    if (employeeStateStatus === 'rejected') {
-        alert("Something went worng!\n" + error.message)
-    }
-
     return (
         <div className="my-5 d-flex flex-column justify-content-center">
             <h2 className="txt-secondary">
                 Table of Departments
             </h2>
 
-            <Form className="pb-2 w-auto" inline onSubmit={onFormSearchSubmit}>
-                <FormGroup className="w-100 justify-content-end">
-                    <div className="d-inline-flex w-50 justify-content-end">
-                        <Input
-                            id="iptSearch"
-                            className="d-inline-block" 
-                            type="text" 
-                            required
-                            onChange={onIptSearchChange}
-                            placeholder="Search item by name..." 
-                        />
-                    </div>
-                    <Button id="searchBtn" className="ml-1" type="submit" color="primary">
-                        <FontAwesomeIcon icon={['fas', 'search']} />
-                    </Button>
-
-                    <UncontrolledTooltip target="searchBtn" placement="top">
-                        Search it
-                    </UncontrolledTooltip>
-                </FormGroup>
-            </Form>
+            <SearchBar onSearchBarSubmit={onFormSearchSubmit} onIptSearchChange={onIptSearchChange} />
             
             <Table striped hover bordered responsive>
                 <thead>
