@@ -145,7 +145,7 @@ const EditEmpModal = (props) => {
                                 </FormGroup>
 
                                 <FormGroup>
-                                    <Label for="inputEmployeeName">Department name:</Label>
+                                    <Label for="inputEmployeeName">Employee name:</Label>
                                     <Input 
                                         type="text" 
                                         id="inputEmployeeName"

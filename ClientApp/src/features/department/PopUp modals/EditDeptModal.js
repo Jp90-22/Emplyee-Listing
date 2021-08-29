@@ -75,7 +75,7 @@ const EditDeptModal = (props) => {
                                     placeholder="ITexample" 
                                 />
                                 <br />
-                                <Button color="info">Add department</Button>
+                                <Button color="info">Update department</Button>
                             </Col>
                         </Row>
                     </Form>
