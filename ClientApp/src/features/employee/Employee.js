@@ -66,18 +66,18 @@ const Employee = () => {
 
     // Dispatching, getting, and redering data
     useEffect(() => {
-        setEmployeesToShow(employees)
-    }, [employees])
-
-    useEffect(() => {
         if (canGetEmployees) {
             dispatch(getEmployeesThunk())
             setCanGetEmployees(false)
         } 
     }, [canGetEmployees, dispatch])
 
+    useEffect(() => {
+        setEmployeesToShow(employees)
+    }, [employees])
+
     const Tbody = ({ employees }) => {
-        const trows = employees.map(
+        const tRows = employees.map(
             (employee, idx) => (
                 <tr key={idx}>
                     <td>{employee.EmployeeId}</td>
@@ -124,7 +124,7 @@ const Employee = () => {
         
         return (
             <tbody>
-                {trows}
+                {tRows}
             </tbody>
         )
     }

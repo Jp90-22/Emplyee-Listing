@@ -8,7 +8,10 @@ import {
 } from './departmentsSlice'
 
 import { 
-    Table, 
+    Table,
+    Form,
+    FormGroup,
+    Input,
     Button, 
     ButtonToolbar, 
     ButtonGroup,
@@ -27,11 +30,12 @@ const Department = () => {
     const departmentStateStatus = useSelector(selectStateStatus)
     const error = useSelector(state => state.Department.error)
 
-    const [canGetDepartments, setCanGetDepartments] = useState(false)
+    const [canGetDepartments, setCanGetDepartments] = useState(true)
     const [modalAddOpened, setModalAddOpened] = useState(false)
     const [modalEditOpened, setModalEditOpened] = useState(false)
     const [departmentToEdit, setDepartmentToEdit] = useState(null)
-    
+    const [departmentToShow, setDepartmentToShow] = useState(departments)
+
     // Handling Popup modals events (Pop up and Pop out)
     const enterAddMode = () => { 
         setModalAddOpened(!modalAddOpened)
@@ -62,19 +66,18 @@ const Department = () => {
 
     // Dispatching, getting, and redering data
     useEffect(() => {
-        setCanGetDepartments(true)
-    }, [])
-
-    useEffect(() => {
         if (canGetDepartments) {
             dispatch(getDepartmentsThunk())
             setCanGetDepartments(false)
         } 
     }, [canGetDepartments, dispatch])
 
-    let tableRows
-    if (departments) {
-        tableRows = departments.map(
+    useEffect(() => {
+        setDepartmentToShow(departments)
+    }, [departments])
+
+    const Tbody = ({ departments }) => {
+        const tRows = departments.map(
             (department, idx) => (
                 <tr key={idx}>
                     <td>{department.DepartmentId}</td>
@@ -116,10 +119,33 @@ const Department = () => {
                 </tr>
             )
         )
+
+        return (
+            <tbody>
+                {tRows}
+            </tbody>
+        )
     }
     
     if (departmentStateStatus === 'rejected') {
         alert("Something went worng!\n" + error.message)
+    }
+
+    // Search Algorimth
+    const searchByName = (name = "") => {
+        const newEntries = departments.filter(
+            (department) => department.DepartmentName.toLocaleLowerCase().includes(name.toLocaleLowerCase())
+        )
+        
+        setDepartmentToShow(newEntries)
+    }
+
+    // Search handler
+    const onIptSearchChange = (e) => searchByName(e.target.value)
+
+    const onFormSearchSubmit = (e) => {
+        e.preventDefault();
+        searchByName(e.target.iptSearch.value)
     }
 
     return (
@@ -128,6 +154,29 @@ const Department = () => {
                 Table of Departments
             </h2>
                 
+            
+            <Form className="pb-2 w-auto" inline onSubmit={onFormSearchSubmit}>
+                <FormGroup className="w-100 justify-content-end">
+                    <div className="d-inline-flex w-50 justify-content-end">
+                        <Input
+                            id="iptSearch"
+                            className="d-inline-block" 
+                            type="text" 
+                            required
+                            onChange={onIptSearchChange}
+                            placeholder="Search item by name..." 
+                        />
+                    </div>
+                    <Button id="searchBtn" className="ml-1" type="submit" color="primary">
+                        <FontAwesomeIcon icon={['fas', 'search']} />
+                    </Button>
+
+                    <UncontrolledTooltip target="searchBtn" placement="top">
+                        Search it
+                    </UncontrolledTooltip>
+                </FormGroup>
+            </Form>
+
             <Table striped hover bordered responsive>
                 <thead>
                     <tr>
@@ -137,9 +186,8 @@ const Department = () => {
                     </tr>
                 </thead>
 
-                <tbody>
-                    {tableRows}
-                </tbody>
+                {(departmentToShow.length !== 0)? <Tbody departments={departmentToShow} /> 
+                        : null}
             </Table>
             
             <FloatingButtons addAction={enterAddMode} reloadAction={() => dispatch(getDepartmentsThunk())} />
