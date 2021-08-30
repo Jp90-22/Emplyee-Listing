@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { unwrapResult } from '@reduxjs/toolkit'
 import {
     getDepartmentsThunk,
     deleteDepartmentThunk,
@@ -20,6 +21,7 @@ import FloatingButtons from '../../app/FloatingButtons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import AddDeptModal from './PopUp modals/AddDeptModal';
 import EditDeptModal from './PopUp modals/EditDeptModal';
+import SweetAlert from 'react-bootstrap-sweetalert';
 
 const Department = () => {
     const dispatch = useDispatch()
@@ -33,6 +35,8 @@ const Department = () => {
     const [modalEditOpened, setModalEditOpened] = useState(false)
     const [departmentToEdit, setDepartmentToEdit] = useState(null)
     const [departmentToShow, setDepartmentToShow] = useState(departments)
+    const [alertToShow, setAlertToShow] = useState(null)
+    const [isAlertShowing, setIsAlertShowing] = useState(false)
 
     // Handling Popup modals events (Pop up and Pop out)
     const enterAddMode = () => { 
@@ -55,11 +59,42 @@ const Department = () => {
     }
 
     const enterDeleteMode = (DepartmentId) => {
-        if(window.confirm("Are you sure you want to delete this department? (This action can't be undone)")) {
-            dispatch(deleteDepartmentThunk(DepartmentId))
-        }
+        setAlertToShow(
+            <SweetAlert
+                warning
+                showCancel
+                confirmBtnText="Yes, delete it!"
+                confirmBtnBsStyle="danger"
+                title="Are you sure?"
+                onConfirm={() => deleteDepartment(DepartmentId)}
+                onCancel={() => setIsAlertShowing(false)}
+                focusCancelBtn
+            >
+                Do you want to delete this department? (This action can't be undone)
+            </SweetAlert>
+        )
 
-        setCanGetDepartments(true)
+        setIsAlertShowing(true)
+    }
+
+    const deleteDepartment = (DepartmentId) => {
+        dispatch(deleteDepartmentThunk(DepartmentId))
+            .then(unwrapResult)
+            .then(() => {
+                setAlertToShow(
+                    <SweetAlert 
+                        success 
+                        title="Department deleted" 
+                        onConfirm={() => {
+                            setIsAlertShowing(false)
+                            setCanGetDepartments(true)
+                        }} 
+                        onCancel={() => setIsAlertShowing(false)}
+                    >
+                        The department was deleted from the data base!
+                    </SweetAlert>
+                )
+            })
     }
 
     // Dispatching, getting, and redering data
@@ -175,6 +210,9 @@ const Department = () => {
             {/* Pop up Add modal */}
             <AddDeptModal isOpen={modalAddOpened} toggle={exitAddMode} />
             <EditDeptModal isOpen={modalEditOpened} toggle={exitEditMode} targetid={departmentToEdit} />
+
+            {/* Alert */}
+            {(isAlertShowing)? alertToShow : null}
 
             {(departmentStateStatus === 'pending')? <AbsoluteCentralizedSpinner /> : null}
         </div>

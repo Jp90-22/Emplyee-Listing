@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
+import { unwrapResult } from '@reduxjs/toolkit'
 import {
     getEmployeesThunk,
     deleteEmployeeThunk,
@@ -20,6 +21,7 @@ import FloatingButtons from '../../app/FloatingButtons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import AddEmpModal from './PopUp modals/AddEmpModal';
 import EditEmpModal from './PopUp modals/EditEmpModal';
+import SweetAlert from 'react-bootstrap-sweetalert';
 
 const Employee = () => {
     const dispatch = useDispatch()
@@ -33,6 +35,8 @@ const Employee = () => {
     const [modalEditOpened, setModalEditOpened] = useState(false)
     const [employeeToEdit, setEmployeeToEdit] = useState(null)
     const [employeesToShow, setEmployeesToShow] = useState(employees)
+    const [alertToShow, setAlertToShow] = useState(null)
+    const [isAlertShowing, setIsAlertShowing] = useState(false)
 
     // Handling Popup modals events (Pop up and Pop out)
     const enterAddMode = () => { 
@@ -55,11 +59,42 @@ const Employee = () => {
     }
 
     const enterDeleteMode = (EmployeeId) => {
-        if(window.confirm("Are you sure you want to delete this employee? (This action can't be undone)")) {
-            dispatch(deleteEmployeeThunk(EmployeeId))
-        }
+        setAlertToShow(
+            <SweetAlert
+                warning
+                showCancel
+                confirmBtnText="Yes, delete it!"
+                confirmBtnBsStyle="danger"
+                title="Are you sure?"
+                onConfirm={() => deleteEmployee(EmployeeId)}
+                onCancel={() => setIsAlertShowing(false)}
+                focusCancelBtn
+            >
+                Do you want to delete this employee? (This action can't be undone)
+            </SweetAlert>
+        )
 
-        setCanGetEmployees(true)
+        setIsAlertShowing(true)
+    }
+
+    const deleteEmployee = (EmployeeId) => {
+        dispatch(deleteEmployeeThunk(EmployeeId))
+            .then(unwrapResult)
+            .then(() => {
+                setAlertToShow(
+                    <SweetAlert 
+                        success 
+                        title="Employee deleted" 
+                        onConfirm={() => {
+                            setIsAlertShowing(false)
+                            setCanGetEmployees(true)
+                        }} 
+                        onCancel={() => setIsAlertShowing(false)}
+                    >
+                        The employee was deleted from the data base!
+                    </SweetAlert>
+                )
+            })
     }
 
     // Dispatching, getting, and redering data
@@ -179,6 +214,9 @@ const Employee = () => {
             {/* Pop up Add modal */}
             <AddEmpModal isOpen={modalAddOpened} toggle={exitAddMode} />
             <EditEmpModal isOpen={modalEditOpened} toggle={exitEditMode} targetid={employeeToEdit} />
+
+            {/* Alert */}
+            {(isAlertShowing)? alertToShow : null}
 
             {(employeeStateStatus === 'pending')? <AbsoluteCentralizedSpinner /> : null}
         </div>
