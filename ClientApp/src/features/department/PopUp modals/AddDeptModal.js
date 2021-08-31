@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux'
 import { postDepartmentThunk } from '../departmentsSlice'
+import { unwrapResult } from '@reduxjs/toolkit'
+
 import {
     Modal, 
     ModalHeader, 
@@ -26,8 +28,11 @@ const AddDeptModal = (props) => {
     const addNewDepartment = (e) => {
         e.preventDefault()
         dispatch(postDepartmentThunk({ DepartmentName: inputDptName}))
-        setInputDptName('')
-        props.toggle()
+            .then(unwrapResult)
+            .then(() => {
+                props.toggle()
+                setInputDptName('')
+            })
     }
 
     return (

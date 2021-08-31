@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux'
 import { updateDepartmentThunk, lookDepartmentById } from '../departmentsSlice'
+import { unwrapResult } from '@reduxjs/toolkit'
+
 import {
     Modal, 
     ModalHeader, 
@@ -37,7 +39,8 @@ const EditDeptModal = (props) => {
             DepartmentId: DepartmentId,
             DepartmentName: inputDptName
         }))
-        props.toggle()
+            .then(unwrapResult)
+            .then(() => props.toggle())
     }
 
     return (

@@ -80,13 +80,15 @@ const AddEmpModal = (props) => {
             Department: inputEmpDepartment,
             DateOfJoining: inputEmpDateOfJoining,
             PhotoFileName: photoThumbnail
-        })).then(() => {
-            props.toggle()
-            setInputEmpName('')
-            setInputEmpDepartment('')
-            setInputEmpDateOfJoining('')
-            setPhotoThumbnail("anonymous.jpg")
-        })
+        }))
+            .then(unwrapResult)
+            .then(() => {
+                props.toggle()
+                setInputEmpName('')
+                setInputEmpDepartment('')
+                setInputEmpDateOfJoining('')
+                setPhotoThumbnail("anonymous.jpg")
+            })
     }
 
     return (

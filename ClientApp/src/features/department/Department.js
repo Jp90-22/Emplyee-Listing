@@ -22,21 +22,25 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import AddDeptModal from './PopUp modals/AddDeptModal';
 import EditDeptModal from './PopUp modals/EditDeptModal';
 import SweetAlert from 'react-bootstrap-sweetalert';
+import ErrorAlert from '../../app/ErrorAlert'
 
 const Department = () => {
     const dispatch = useDispatch()
     
     const departments = useSelector(getDeparments)
     const departmentStateStatus = useSelector(selectStateStatus)
-    const error = useSelector(state => state.Department.error)
+    const stateError = useSelector(state => state.Department.error)
 
     const [canGetDepartments, setCanGetDepartments] = useState(true)
     const [modalAddOpened, setModalAddOpened] = useState(false)
     const [modalEditOpened, setModalEditOpened] = useState(false)
     const [departmentToEdit, setDepartmentToEdit] = useState(null)
     const [departmentToShow, setDepartmentToShow] = useState(departments)
-    const [alertToShow, setAlertToShow] = useState(null)
+    const [alertProps, setAlertProps] = useState({ title: "", onConfirm: () => null })
+    const [alertMessage, setAlertMessage] = useState("")
     const [isAlertShowing, setIsAlertShowing] = useState(false)
+    const [errorAlertMessage, setErrorAlertMessage] = useState("")
+    const [isErrorAlertShowing, setIsErrorAlertShowing] = useState(false)
 
     // Handling Popup modals events (Pop up and Pop out)
     const enterAddMode = () => { 
@@ -59,20 +63,20 @@ const Department = () => {
     }
 
     const enterDeleteMode = (DepartmentId) => {
-        setAlertToShow(
-            <SweetAlert
-                warning
-                showCancel
-                confirmBtnText="Yes, delete it!"
-                confirmBtnBsStyle="danger"
-                title="Are you sure?"
-                onConfirm={() => deleteDepartment(DepartmentId)}
-                onCancel={() => setIsAlertShowing(false)}
-                focusCancelBtn
-            >
-                Do you want to delete this department? (This action can't be undone)
-            </SweetAlert>
-        )
+        setAlertProps({
+            warning: true,
+            showCancel: true,
+            confirmBtnText: "Yes, delete it!",
+            confirmBtnBsStyle: "danger",
+            title: "Are you sure?",
+            onConfirm: () => {
+                setIsAlertShowing(false)
+                deleteDepartment(DepartmentId)
+            },
+            focusCancelBtn: true
+        })
+
+        setAlertMessage("Do you want to delete this department? (This action can't be undone)")
 
         setIsAlertShowing(true)
     }
@@ -81,19 +85,18 @@ const Department = () => {
         dispatch(deleteDepartmentThunk(DepartmentId))
             .then(unwrapResult)
             .then(() => {
-                setAlertToShow(
-                    <SweetAlert 
-                        success 
-                        title="Department deleted" 
-                        onConfirm={() => {
-                            setIsAlertShowing(false)
-                            setCanGetDepartments(true)
-                        }} 
-                        onCancel={() => setIsAlertShowing(false)}
-                    >
-                        The department was deleted from the data base!
-                    </SweetAlert>
-                )
+                setAlertProps({
+                    success: true,
+                    title: "Department deleted",
+                    onConfirm: () => {
+                        setIsAlertShowing(false)
+                        setCanGetDepartments(true)
+                    }
+                })
+
+                setAlertMessage("The department was deleted from the data base!")
+
+                setIsAlertShowing(true)
             })
     }
 
@@ -109,11 +112,18 @@ const Department = () => {
         setDepartmentToShow(departments)
     }, [departments])
 
+    useEffect(() => {
+        if (stateError) {
+            setErrorAlertMessage(stateError.message)
+            setIsErrorAlertShowing(true)
+        }
+    }, [stateError])
+
     let Tbody = ({ departments }) => {
         const tRows = departments.map(
             (department, idx) => (
                 <tr key={idx}>
-                    <td>{department.DepartmentId}</td>
+                    <th scope="row">{department.DepartmentId}</th>
                     <td>{department.DepartmentName}</td>
 
                     {/* Department actions */}
@@ -160,12 +170,7 @@ const Department = () => {
         )
     }
     
-    Tbody = React.memo(Tbody)
-
-    // Error handler
-    if (departmentStateStatus === 'rejected') {
-        alert("Something went worng!\n" + error.message)
-    }
+    Tbody = React.memo(Tbody) // Memoized Tbody component props
 
     // Search Algorimth
     const searchByName = (name = "") => {
@@ -211,8 +216,16 @@ const Department = () => {
             <AddDeptModal isOpen={modalAddOpened} toggle={exitAddMode} />
             <EditDeptModal isOpen={modalEditOpened} toggle={exitEditMode} targetid={departmentToEdit} />
 
-            {/* Alert */}
-            {(isAlertShowing)? alertToShow : null}
+             {/* Alert */}
+            <SweetAlert show={isAlertShowing} {...alertProps} onCancel={() => setIsAlertShowing(false)}>
+                {alertMessage}
+            </SweetAlert>
+            <ErrorAlert
+                show={isErrorAlertShowing}
+                onCancel={() => setIsErrorAlertShowing(false)}
+                onConfirm={() => setIsErrorAlertShowing(false)}
+                errorMessage={errorAlertMessage}
+            />
 
             {(departmentStateStatus === 'pending')? <AbsoluteCentralizedSpinner /> : null}
         </div>

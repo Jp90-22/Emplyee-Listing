@@ -22,6 +22,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import AddEmpModal from './PopUp modals/AddEmpModal';
 import EditEmpModal from './PopUp modals/EditEmpModal';
 import SweetAlert from 'react-bootstrap-sweetalert';
+import ErrorAlert from '../../app/ErrorAlert'
 
 const Employee = () => {
     const dispatch = useDispatch()
@@ -122,7 +123,7 @@ const Employee = () => {
         const tRows = employees.map(
             (employee, idx) => (
                 <tr key={idx}>
-                    <td>{employee.EmployeeId}</td>
+                    <th scope="row">{employee.EmployeeId}</th>
                     <td>{employee.EmployeeName}</td>
                     <td>{employee.Department}</td>
                     <td>{employee.DateOfJoining}</td>
@@ -223,22 +224,12 @@ const Employee = () => {
             <SweetAlert show={isAlertShowing} {...alertProps} onCancel={() => setIsAlertShowing(false)}>
                 {alertMessage}
             </SweetAlert>
-            <SweetAlert
-                title="Oops! Something failed..."
+            <ErrorAlert
                 show={isErrorAlertShowing}
-                error
-                confirmBtnText="Ok"
-                confirmBtnBsStyle="primary"
                 onCancel={() => setIsErrorAlertShowing(false)}
                 onConfirm={() => setIsErrorAlertShowing(false)}
-                focusConfirmBtn
-                showCloseButton
-            >
-                {
-                    errorAlertMessage + 
-                    ", try again and if the problem percist try again later"
-                }
-            </SweetAlert>
+                errorMessage={errorAlertMessage}
+            />
 
             {(employeeStateStatus === 'pending')? <AbsoluteCentralizedSpinner /> : null}
         </div>
