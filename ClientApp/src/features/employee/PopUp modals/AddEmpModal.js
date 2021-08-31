@@ -31,7 +31,6 @@ const AddEmpModal = (props) => {
 
     const dptNamesStatus = useSelector(selectDptNamesStatus)
     const photoStatus = useSelector(selectPhotoStatus)
-    const error = useSelector(state => state.Employee.error)
 
     const [inputEmpName, setInputEmpName] = useState('')
     const [inputEmpDepartment, setInputEmpDepartment] = useState('')
@@ -81,18 +80,13 @@ const AddEmpModal = (props) => {
             Department: inputEmpDepartment,
             DateOfJoining: inputEmpDateOfJoining,
             PhotoFileName: photoThumbnail
-        }))
-        
-        setInputEmpName('')
-        setInputEmpDepartment('')
-        setInputEmpDateOfJoining('')
-        setPhotoThumbnail("anonymous.jpg")
-
-        props.toggle()
-    }
-
-    if (dptNamesStatus === 'rejected' || photoStatus === 'rejected') {
-        alert("Something went wrong!\n" + error.message)
+        })).then(() => {
+            props.toggle()
+            setInputEmpName('')
+            setInputEmpDepartment('')
+            setInputEmpDateOfJoining('')
+            setPhotoThumbnail("anonymous.jpg")
+        })
     }
 
     return (

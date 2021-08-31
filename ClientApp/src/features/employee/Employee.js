@@ -28,15 +28,18 @@ const Employee = () => {
     
     const employees = useSelector(getEmployees)
     const employeeStateStatus = useSelector(selectStateStatus)
-    const error = useSelector(state => state.Employee.error)
+    const stateError = useSelector(state => state.Employee.error)
 
     const [canGetEmployees, setCanGetEmployees] = useState(true)
     const [modalAddOpened, setModalAddOpened] = useState(false)
     const [modalEditOpened, setModalEditOpened] = useState(false)
     const [employeeToEdit, setEmployeeToEdit] = useState(null)
     const [employeesToShow, setEmployeesToShow] = useState(employees)
-    const [alertToShow, setAlertToShow] = useState(null)
+    const [alertProps, setAlertProps] = useState({ title: "", onConfirm: () => null })
+    const [alertMessage, setAlertMessage] = useState("")
     const [isAlertShowing, setIsAlertShowing] = useState(false)
+    const [errorAlertMessage, setErrorAlertMessage] = useState("")
+    const [isErrorAlertShowing, setIsErrorAlertShowing] = useState(false)
 
     // Handling Popup modals events (Pop up and Pop out)
     const enterAddMode = () => { 
@@ -59,20 +62,20 @@ const Employee = () => {
     }
 
     const enterDeleteMode = (EmployeeId) => {
-        setAlertToShow(
-            <SweetAlert
-                warning
-                showCancel
-                confirmBtnText="Yes, delete it!"
-                confirmBtnBsStyle="danger"
-                title="Are you sure?"
-                onConfirm={() => deleteEmployee(EmployeeId)}
-                onCancel={() => setIsAlertShowing(false)}
-                focusCancelBtn
-            >
-                Do you want to delete this employee? (This action can't be undone)
-            </SweetAlert>
-        )
+        setAlertProps({
+            warning: true,
+            showCancel: true,
+            confirmBtnText: "Yes, delete it!",
+            confirmBtnBsStyle: "danger",
+            title: "Are you sure?",
+            onConfirm: () => {
+                setIsAlertShowing(false)
+                deleteEmployee(EmployeeId)
+            },
+            focusCancelBtn: true
+        })
+
+        setAlertMessage("Do you want to delete this employee? (This action can't be undone)")
 
         setIsAlertShowing(true)
     }
@@ -81,19 +84,18 @@ const Employee = () => {
         dispatch(deleteEmployeeThunk(EmployeeId))
             .then(unwrapResult)
             .then(() => {
-                setAlertToShow(
-                    <SweetAlert 
-                        success 
-                        title="Employee deleted" 
-                        onConfirm={() => {
-                            setIsAlertShowing(false)
-                            setCanGetEmployees(true)
-                        }} 
-                        onCancel={() => setIsAlertShowing(false)}
-                    >
-                        The employee was deleted from the data base!
-                    </SweetAlert>
-                )
+                setAlertProps({
+                    success: true,
+                    title: "Employee deleted",
+                    onConfirm: () => {
+                        setIsAlertShowing(false)
+                        setCanGetEmployees(true)
+                    }
+                })
+
+                setAlertMessage("The employee was deleted from the data base!")
+
+                setIsAlertShowing(true)
             })
     }
 
@@ -108,6 +110,13 @@ const Employee = () => {
     useEffect(() => {
         setEmployeesToShow(employees)
     }, [employees])
+
+    useEffect(() => {
+        if (stateError) {
+            setErrorAlertMessage(stateError.message)
+            setIsErrorAlertShowing(true)
+        }
+    }, [stateError])
 
     let Tbody = ({ employees }) => {
         const tRows = employees.map(
@@ -162,12 +171,7 @@ const Employee = () => {
         )
     }
 
-    Tbody = React.memo(Tbody)
-
-    // Error handler
-    if (employeeStateStatus === 'rejected') {
-        alert("Something went worng!\n" + error.message)
-    }
+    Tbody = React.memo(Tbody) // Memoized Tbody component props
 
     // Search Algorimth
     const searchByName = (name = "") => {
@@ -216,7 +220,25 @@ const Employee = () => {
             <EditEmpModal isOpen={modalEditOpened} toggle={exitEditMode} targetid={employeeToEdit} />
 
             {/* Alert */}
-            {(isAlertShowing)? alertToShow : null}
+            <SweetAlert show={isAlertShowing} {...alertProps} onCancel={() => setIsAlertShowing(false)}>
+                {alertMessage}
+            </SweetAlert>
+            <SweetAlert
+                title="Oops! Something failed..."
+                show={isErrorAlertShowing}
+                error
+                confirmBtnText="Ok"
+                confirmBtnBsStyle="primary"
+                onCancel={() => setIsErrorAlertShowing(false)}
+                onConfirm={() => setIsErrorAlertShowing(false)}
+                focusConfirmBtn
+                showCloseButton
+            >
+                {
+                    errorAlertMessage + 
+                    ", try again and if the problem percist try again later"
+                }
+            </SweetAlert>
 
             {(employeeStateStatus === 'pending')? <AbsoluteCentralizedSpinner /> : null}
         </div>
